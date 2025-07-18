@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Profile | ConnectMe Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #7F5AF0;
+      --primary-dark: #6C4BD1;
+      --primary-light: #9B7AFF;
+      --secondary: #2CB67D;
+      --accent: #FF8906;
+      --bg-dark: #16161A;
+      --bg-darker: #0E0E10;
+      --bg-card: #242629;
+      --text-light: #FFFFFE;
+      --text-muted: #94A1B2;
+      --danger: #EF4565;
+      --success: #2CB67D;
+      --warning: #FF8906;
+      --info: #7F5AF0;
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .app-logo {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .header p {
+      color: var(--text-muted);
+    }
+    
+    .profile-form {
+      background: var(--bg-card);
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: var(--text-light);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.2);
+    }
+    
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .photo-upload {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .photo-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 15px;
+      display: block;
+      border: 3px solid var(--primary);
+      background-color: var(--bg-darker);
+    }
+    
+    .upload-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .interests-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .interest-tag {
+      background: rgba(127, 90, 240, 0.2);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .interest-tag.selected {
+      background: var(--gradient-primary);
+      color: white;
+    }
+    
+    .preferences-group {
+      margin-top: 15px;
+    }
+    
+    .preference-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .preference-item:last-child {
+      border-bottom: none;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background: var(--gradient-primary);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 10px;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(127, 90, 240, 0.4);
+    }
+    
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: none;
+      animation: fadeIn 0.3s forwards;
+    }
+    
+    .toast.success {
+      background: var(--success);
+    }
+    
+    .toast.error {
+      background: var(--danger);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px) translateX(-50%); }
+      to { opacity: 1; transform: translateY(0) translateX(-50%); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .profile-form {
+        padding: 20px 15px;
+      }
+      
+      .photo-preview {
+        width: 120px;
+        height: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header animate__animated animate__fadeIn">
+      <div class="app-logo">ConnectMe Pro</div>
+      <h1>Complete Your Profile</h1>
+      <p>Finish setting up your profile to start connecting</p>
+    </div>
+    
+    <form id="profileForm" class="profile-form animate__animated animate__fadeInUp">
+      <!-- Profile Photo Upload -->
+      <div class="form-group photo-upload">
+        <img id="photoPreview" class="photo-preview" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Preview">
+        <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+        <button type="button" class="upload-btn" onclick="document.getElementById('photoUpload').click()">Upload Photo</button>
+      </div>
+      
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" class="form-control" placeholder="Choose a unique username" required>
+      </div>
+      
+      <!-- Bio/About Me -->
+      <div class="form-group">
+        <label for="bio">About You</label>
+        <textarea id="bio" class="form-control" placeholder="Tell others about yourself (min. 50 characters)" required></textarea>
+      </div>
+      
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" class="form-control" placeholder="City, Country" required>
+      </div>
+      
+      <!-- Interests -->
+      <div class="form-group">
+        <label>Your Interests (Select at least 3)</label>
+        <div class="interests-container" id="interestsContainer">
+          <!-- Interests will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <!-- Preferences -->
+      <div class="form-group preferences-group">
+        <label>Profile Preferences</label>
+        
+        <div class="preference-item">
+          <span>Show my age on profile</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showAge" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="preference-item">
+          <span>Show my distance from others</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showDistance" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span id="submitText">Complete Profile</span>
+        <div id="submitSpinner" class="spinner"></div>
+      </button>
+    </form>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // DOM Elements
+    const profileForm = document.getElementById('profileForm');
+    const photoUpload = document.getElementById('photoUpload');
+    const photoPreview = document.getElementById('photoPreview');
+    const usernameInput = document.getElementById('username');
+    const bioInput = document.getElementById('bio');
+    const locationInput = document.getElementById('location');
+    const interestsContainer = document.getElementById('interestsContainer');
+    const showAgeToggle = document.getElementById('showAge');
+    const showDistanceToggle = document.getElementById('showDistance');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const toast = document.getElementById('toast');
+    
+    // Sample interests - in a real app, these might come from your backend
+    const availableInterests = [
+      'Travel', 'Music', 'Sports', 'Gaming', 'Cooking', 
+      'Photography', 'Art', 'Reading', 'Fitness', 'Dancing',
+      'Movies', 'Technology', 'Nature', 'Animals', 'Foodie',
+      'Fashion', 'Writing', 'Meditation', 'Yoga', 'Cycling'
+    ];
+    
+    // Selected interests array
+    let selectedInterests = [];
+    
+    // Current user data
+    let currentUser = null;
+    
+    // Show toast notification
+    function showToast(message, type = '') {
+      toast.textContent = message;
+      toast.className = 'toast';
+      if (type) toast.classList.add(type);
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+    
+    // Set loading state
+    function setLoading(isLoading) {
+      if (isLoading) {
+        submitText.style.display = 'none';
+        submitSpinner.style.display = 'block';
+        submitBtn.disabled = true;
+      } else {
+        submitText.style.display = 'block';
+        submitSpinner.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+    
+    // Initialize interests selection
+    function initInterests() {
+      interestsContainer.innerHTML = '';
+      
+      availableInterests.forEach(interest => {
+        const interestElement = document.createElement('div');
+        interestElement.className = 'interest-tag';
+        interestElement.textContent = interest;
+        interestElement.dataset.interest = interest.toLowerCase();
+        
+        interestElement.addEventListener('click', () => {
+          interestElement.classList.toggle('selected');
+          
+          // Update selected interests array
+          if (interestElement.classList.contains('selected')) {
+            selectedInterests.push(interest);
+          } else {
+            selectedInterests = selectedInterests.filter(item => item !== interest);
+          }
+        });
+        
+        interestsContainer.appendChild(interestElement);
+      });
+    }
+    
+    // Handle photo upload
+    photoUpload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.match('image.*')) {
+        showToast('Please select an image file', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        photoPreview.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    // Load current user data
+    function loadUserData() {
+      // Get user from session or local storage
+      const userFromSession = sessionStorage.getItem('connectme_current_user');
+      const userFromLocal = localStorage.getItem('connectme_users');
+      
+      if (userFromSession) {
+        currentUser = JSON.parse(userFromSession);
+        
+        // If user has existing profile data, pre-fill the form
+        if (currentUser.profile) {
+          if (currentUser.profile.photo) {
+            photoPreview.src = currentUser.profile.photo;
+          }
+          if (currentUser.profile.username) {
+            usernameInput.value = currentUser.profile.username;
+          }
+          if (currentUser.profile.bio) {
+            bioInput.value = currentUser.profile.bio;
+          }
+          if (currentUser.profile.location) {
+            locationInput.value = currentUser.profile.location;
+          }
+          if (currentUser.profile.interests) {
+            selectedInterests = currentUser.profile.interests;
+            // Mark interests as selected in UI
+            document.querySelectorAll('.interest-tag').forEach(tag => {
+              if (selectedInterests.includes(tag.textContent)) {
+                tag.classList.add('selected');
+              }
+            });
+          }
+          if (currentUser.profile.preferences) {
+            if (currentUser.profile.preferences.showAge !== undefined) {
+              showAgeToggle.checked = currentUser.profile.preferences.showAge;
+            }
+            if (currentUser.profile.preferences.showDistance !== undefined) {
+              showDistanceToggle.checked = currentUser.profile.preferences.showDistance;
+            }
+          }
+        }
+      } else if (userFromLocal) {
+        // Fallback to local storage if needed
+        const users = JSON.parse(userFromLocal);
+        const email = sessionStorage.getItem('connectme_user_email');
+        if (email) {
+          currentUser = users.find(u => u.email === email);
+        }
+      }
+      
+      // If no user found, redirect to login
+      if (!currentUser) {
+        showToast('Please login first', 'error');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+      }
+    }
+    
+    // Save profile data
+    function saveProfile(e) {
+      e.preventDefault();
+      
+      // Validate form
+      const username = usernameInput.value.trim();
+      const bio = bioInput.value.trim();
+      const location = locationInput.value.trim();
+      
+      if (!username) {
+        showToast('Username is required', 'error');
+        return;
+      }
+      
+      if (!bio || bio.length < 50) {
+        showToast('Bio must be at least 50 characters', 'error');
+        return;
+      }
+      
+      if (!location) {
+        showToast('Location is required', 'error');
+        return;
+      }
+      
+      if (selectedInterests.length < 3) {
+        showToast('Please select at least 3 interests', 'error');
+        return;
+      }
+      
+      // Show loading state
+      setLoading(true);
+      
+      // Get photo data if uploaded
+      let photoData = '';
+      if (photoUpload.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          photoData = event.target.result;
+          completeProfileSave(username, bio, location, photoData);
+        };
+        reader.readAsDataURL(photoUpload.files[0]);
+      } else {
+        // Use existing photo if available
+        photoData = currentUser.profile?.photo || '';
+        completeProfileSave(username, bio, location, photoData);
+      }
+    }
+    
+    // Complete profile saving after photo is processed
+    function completeProfileSave(username, bio, location, photo) {
+      // Update current user profile data
+      currentUser.profile = {
+        ...currentUser.profile,
+        username,
+        bio,
+        location,
+        photo,
+        interests: selectedInterests,
+        preferences: {
+          showAge: showAgeToggle.checked,
+          showDistance: showDistanceToggle.checked
+        },
+        profileComplete: true,
+        completedAt: new Date().toISOString()
+      };
+      
+      // Update user in session storage
+      sessionStorage.setItem('connectme_current_user', JSON.stringify(currentUser));
+      
+      // Update user in local storage (if exists)
+      const users = JSON.parse(localStorage.getItem('connectme_users')) || [];
+      const userIndex = users.findIndex(u => u.email === currentUser.email);
+      
+      if (userIndex !== -1) {
+        users[userIndex] = currentUser;
+        localStorage.setItem('connectme_users', JSON.stringify(users));
+      }
+      
+      // Show success and redirect
+      showToast('Profile saved successfully!', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'home.html';
+      }, 1500);
+    }
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      initInterests();
+      loadUserData();
+      
+      // Form submission
+      profileForm.addEventListener('submit', saveProfile);
+    });
+  </script>
+</body>
+</html>
