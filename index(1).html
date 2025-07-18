@@ -1,0 +1,2865 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConnectMe Pro</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #7F5AF0;
+      --primary-dark: #6C4BD1;
+      --primary-light: #9B7AFF;
+      --secondary: #2CB67D;
+      --accent: #FF8906;
+      --bg-dark: #16161A;
+      --bg-darker: #0E0E10;
+      --bg-card: #242629;
+      --text-light: #FFFFFE;
+      --text-muted: #94A1B2;
+      --msg-me: #7F5AF0;
+      --msg-other: #2A2A3A;
+      --online: #2CB67D;
+      --offline: #72757E;
+      --danger: #EF4565;
+      --success: #2CB67D;
+      --warning: #FF8906;
+      --info: #7F5AF0;
+      
+      /* New gradient variables */
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, #26C485 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #FF9E3D 100%);
+      --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #F5627F 100%);
+      
+      /* Role colors */
+      --top-color: #7F5AF0;
+      --bottom-color: #2CB67D;
+      --vers-color: #FF8906;
+      --side-color: #72757E;
+      
+      /* Animation */
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Splash Screen */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-darker);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeOut 0.5s 2s forwards;
+    }
+    
+    .splash-logo {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulse 2s infinite;
+    }
+    
+    .splash-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+    
+    .loading-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .loading-progress {
+      height: 100%;
+      width: 0;
+      background: var(--gradient-primary);
+      animation: loading 2s forwards;
+    }
+    
+    @keyframes loading {
+      to { width: 100%; }
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Page transitions */
+    .page {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      animation: fadeIn 0.5s forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .scrollable-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 80px;
+      scroll-behavior: smooth;
+    }
+    
+    /* Auth Pages */
+    .auth-page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-darker);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .auth-page::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(127, 90, 240, 0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+      z-index: 0;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .auth-container {
+      background: var(--bg-card);
+      padding: 30px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+    
+    .app-logo {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    
+    input, button, select, textarea {
+      width: 100%;
+      padding: 15px 20px;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    input, select, textarea {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-light);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.2);
+      background: rgba(127, 90, 240, 0.05);
+    }
+    
+    button {
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    button:hover::after {
+      opacity: 1;
+    }
+    
+    button.secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    
+    button.secondary:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    .divider {
+      margin: 1.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+    }
+    
+    .divider-text {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      padding: 0 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    
+    .error-message {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      display: none;
+    }
+    
+    .forgot-password {
+      text-align: right;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .forgot-password a {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .forgot-password a:hover {
+      color: var(--primary);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s forwards;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: modalIn 0.3s forwards;
+    }
+    
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .close-modal:hover {
+      color: var(--text-light);
+      transform: rotate(90deg);
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      display: none;
+      justify-content: space-around;
+      background: var(--bg-card);
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 8px 12px;
+      min-width: 70px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .nav-icon {
+      margin-bottom: 4px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .nav-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      transform: translateY(-5px);
+    }
+    
+    .nav-item.active .nav-icon {
+      transform: scale(1.2);
+    }
+    
+    /* Dashboard Page */
+    .home-header {
+      padding: 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      transition: var(--transition);
+    }
+    
+    .search-bar:focus-within {
+      background: rgba(127, 90, 240, 0.1);
+      box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.2);
+    }
+    
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      padding: 8px;
+    }
+    
+    .filter-options {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    
+    .filter-options::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .filter-option {
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      color: var(--text-light);
+      font-size: 14px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .filter-option.active {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .profile-grid-container {
+      padding: 16px;
+    }
+    
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    
+    .profile-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border-color: rgba(127, 90, 240, 0.3);
+    }
+    
+    .profile-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .profile-card:hover .profile-image {
+      transform: scale(1.05);
+    }
+    
+    .profile-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(5px);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    
+    .online {
+      background: var(--online);
+      box-shadow: 0 0 10px var(--online);
+    }
+    
+    .offline {
+      background: var(--offline);
+    }
+    
+    .role-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.7);
+      color: white;
+    }
+    
+    .top-badge {
+      background: var(--top-color);
+    }
+    
+    .bottom-badge {
+      background: var(--bottom-color);
+    }
+    
+    .vers-badge {
+      background: var(--vers-color);
+      color: black;
+    }
+    
+    .side-badge {
+      background: var(--side-color);
+    }
+    
+    .verified-badge {
+      background: var(--accent);
+      color: black;
+    }
+    
+    .ai-match-badge {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .profile-info {
+      padding: 12px;
+    }
+    
+    .profile-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .profile-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .profile-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 0 4px;
+      transition: var(--transition);
+    }
+    
+    .message-btn {
+      background: var(--gradient-primary);
+      color: white;
+    }
+    
+    .message-btn:hover {
+      box-shadow: 0 2px 10px rgba(127, 90, 240, 0.3);
+    }
+    
+    .like-btn {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-light);
+    }
+    
+    .like-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    /* Profile View Page */
+    .profile-view {
+      background: var(--bg-dark);
+    }
+    
+    .profile-header {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    
+    .profile-header-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .profile-header:hover .profile-header-image {
+      transform: scale(1.05);
+    }
+    
+    .profile-header-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    }
+    
+    .profile-name-large {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .profile-age {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+    
+    .profile-actions-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+    
+    .back-button {
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(5px);
+    }
+    
+    .back-button:hover {
+      background: rgba(127, 90, 240, 0.5);
+      transform: scale(1.1);
+    }
+    
+    .action-button {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(127, 90, 240, 0.4);
+    }
+    
+    .profile-details-section {
+      padding: 20px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    
+    .detail-item {
+      margin-bottom: 16px;
+    }
+    
+    .detail-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    
+    .detail-value {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .role-display {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    
+    /* Messages Page */
+    .messages-header {
+      padding: 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .messages-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .chat-list {
+      padding: 16px;
+    }
+    
+    .chat-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .chat-item:hover {
+      background: rgba(127, 90, 240, 0.05);
+      border-color: rgba(127, 90, 240, 0.2);
+    }
+    
+    .chat-item-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      transition: var(--transition);
+    }
+    
+    .chat-item:hover .chat-item-image {
+      transform: scale(1.1);
+    }
+    
+    .chat-item-info {
+      flex: 1;
+    }
+    
+    .chat-item-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .chat-item-preview {
+      font-size: 14px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .chat-item-time {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .chat-item-unread {
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    
+    /* Chat Page */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .chat-user {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .chat-user-image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .chat-user:hover .chat-user-image {
+      transform: scale(1.1);
+    }
+    
+    .chat-user-info h3 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .chat-user-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .chat-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .chat-action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition);
+    }
+    
+    .chat-action-btn:hover {
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    
+    .chat-action-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--bg-card);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      padding: 8px 0;
+      min-width: 200px;
+      z-index: 10;
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+    
+    .chat-action-menu.show {
+      display: block;
+      animation: fadeIn 0.2s forwards;
+    }
+    
+    .chat-action-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .chat-action-item:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: var(--bg-dark);
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABnSURBVDhP7cxBCsAgDETR6P3P3KZQKBRK/5RCC3kQCMwHmRljjDHGGGPMH7i7A5iZ8ZxzxhgxRpxz4r0X7z0iQkQwM9ZaxBgxxuC9x1qLtRZrLdZa7L3/AhPvGZCkJKkGAAAAAElFTkSuQmCC');
+    }
+    
+    .chat-message {
+      margin-bottom: 16px;
+      display: flex;
+      max-width: 80%;
+      position: relative;
+    }
+    
+    .chat-message-content {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      transition: var(--transition);
+    }
+    
+    .me {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+    
+    .me .chat-message-content {
+      background: var(--msg-me);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .other .chat-message-content {
+      background: var(--msg-other);
+      color: var(--text-light);
+      border-bottom-left-radius: 4px;
+    }
+    
+    .chat-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      position: absolute;
+      bottom: -16px;
+      right: 10px;
+    }
+    
+    .other .chat-time {
+      left: 10px;
+      right: auto;
+    }
+    
+    .read-receipt {
+      display: inline-flex;
+      margin-left: 5px;
+      color: var(--primary);
+    }
+    
+    .chat-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 12px;
+      margin-top: 4px;
+      transition: var(--transition);
+    }
+    
+    .chat-image:hover {
+      transform: scale(1.05);
+    }
+    
+    .chat-input-container {
+      display: flex;
+      padding: 12px;
+      background: var(--bg-card);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      align-items: center;
+      position: sticky;
+      bottom: 0;
+    }
+    
+    .chat-input {
+      flex: 1;
+      margin-right: 12px;
+      border-radius: 24px;
+      border: none;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+    
+    .chat-input:focus {
+      background: rgba(127, 90, 240, 0.1);
+      box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.2);
+    }
+    
+    .emoji-btn, .send-button, .image-upload-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-left: 8px;
+    }
+    
+    .emoji-btn, .image-upload-btn {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .emoji-btn:hover, .image-upload-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .send-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(127, 90, 240, 0.3);
+    }
+    
+    .typing-indicator {
+      display: flex;
+      padding: 12px 16px;
+      background: var(--msg-other);
+      border-radius: 18px;
+      width: fit-content;
+      margin-bottom: 16px;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--text-muted);
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+    
+    /* Settings Page */
+    .settings-container {
+      padding: 16px;
+    }
+    
+    .settings-section {
+      margin-bottom: 24px;
+    }
+    
+    .settings-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: var(--transition);
+    }
+    
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+    
+    .settings-item:hover {
+      background: rgba(127, 90, 240, 0.05);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    
+    .settings-item-label {
+      font-size: 16px;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background: var(--gradient-primary);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .logout-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      font-weight: 600;
+      margin-top: 24px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .logout-btn:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    /* Edit Profile Modal */
+    .edit-profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .role-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .role-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .role-option:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    .role-option.selected {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .role-option input {
+      margin-right: 8px;
+    }
+    
+    /* Likes Page */
+    .likes-container {
+      padding: 16px;
+    }
+    
+    .like-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .like-item:hover {
+      background: rgba(127, 90, 240, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    .like-item-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      transition: var(--transition);
+    }
+    
+    .like-item:hover .like-item-image {
+      transform: scale(1.1);
+    }
+    
+    .like-item-info {
+      flex: 1;
+    }
+    
+    .like-item-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .like-item-time {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    
+    /* Email Simulation */
+    .email-simulation {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    
+    .email-header {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .reset-link {
+      display: inline-block;
+      background: var(--gradient-primary);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 15px;
+      transition: var(--transition);
+    }
+    
+    .reset-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(127, 90, 240, 0.3);
+    }
+    
+    /* Verification Modal */
+    .verification-container {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .verification-steps {
+      text-align: left;
+      margin: 20px 0;
+    }
+    
+    .verification-step {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .verification-step-number {
+      width: 30px;
+      height: 30px;
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .verification-video {
+      width: 100%;
+      max-width: 400px;
+      height: 300px;
+      background: #000;
+      margin: 20px auto;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    /* Compatibility Score */
+    .compatibility-score {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) 0% 85%, #eee 85% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+    }
+    
+    .score-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .score-details {
+      flex: 1;
+    }
+    
+    .score-factor {
+      margin-bottom: 8px;
+    }
+    
+    .score-factor-name {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    
+    .score-factor-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .score-factor-progress {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 85%;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .profile-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      
+      .auth-container {
+        padding: 20px;
+      }
+      
+      .role-options {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 20px rgba(127, 90, 240, 0.3);
+      cursor: pointer;
+      z-index: 90;
+      transition: var(--transition);
+    }
+    
+    .fab:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 6px 25px rgba(127, 90, 240, 0.4);
+    }
+    
+    /* Pulse animation for notifications */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Glow effect */
+    .glow {
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.5);
+    }
+    
+    /* Shimmer effect */
+    .shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div class="splash-screen">
+    <div class="splash-logo animate__animated animate__fadeIn">ConnectMe Pro</div>
+    <div class="splash-subtitle animate__animated animate__fadeIn animate__delay-1s">Connecting souls, creating stories</div>
+    <div class="loading-bar animate__animated animate__fadeIn animate__delay-1s">
+      <div class="loading-progress"></div>
+    </div>
+  </div>
+
+  <!-- Auth Pages -->
+  <section class="page auth-page" id="loginPage">
+    <div class="auth-container">
+      <div class="app-logo">ConnectMe Pro</div>
+      
+      <div class="input-group">
+        <input id="email" type="email" placeholder="Email" required>
+        <div id="emailError" class="error-message">Please enter a valid email</div>
+      </div>
+      <div class="input-group">
+        <input id="password" type="password" placeholder="Password" required>
+        <div class="forgot-password">
+          <a href="#" onclick="openForgotPasswordModal(); return false;">Forgot password?</a>
+        </div>
+        <div id="passwordError" class="error-message">Password must be at least 6 characters</div>
+      </div>
+      <button onclick="loginUser()">Login</button>
+      <div class="divider">
+        <span class="divider-text">or</span>
+      </div>
+      <button class="secondary" onclick="showPage('registerPage')">Create New Account</button>
+    </div>
+  </section>
+
+  <section class="page auth-page" id="registerPage">
+    <div class="auth-container">
+      <button class="back-button" onclick="showPage('loginPage')">←</button>
+      <div class="app-logo">ConnectMe Pro</div>
+      <div class="input-group">
+        <input id="regEmail" type="email" placeholder="Email" required>
+        <div id="regEmailError" class="error-message">Please enter a valid email</div>
+      </div>
+      <div class="input-group">
+        <input id="regPassword" type="password" placeholder="Password" required>
+        <div id="regPasswordError" class="error-message">Password must be at least 6 characters</div>
+      </div>
+      <div class="input-group">
+        <input id="regName" type="text" placeholder="Your Name" required>
+      </div>
+      <button onclick="openRegisterModal()">Continue</button>
+    </div>
+  </section>
+
+  <!-- Register Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Complete Your Profile</h2>
+        <button class="close-modal" onclick="closeModal('registerModal')">×</button>
+      </div>
+      <div class="edit-profile-form">
+        <div class="input-group">
+          <label for="regAge">Age</label>
+          <input id="regAge" type="number" min="18" max="99" placeholder="Your age" required>
+        </div>
+        
+        <div class="input-group">
+          <label>Role</label>
+          <div class="role-options">
+            <div class="role-option" onclick="selectRole('top')">
+              <input type="radio" id="roleTop" name="role" value="top">
+              <label for="roleTop">Top</label>
+            </div>
+            <div class="role-option" onclick="selectRole('bottom')">
+              <input type="radio" id="roleBottom" name="role" value="bottom">
+              <label for="roleBottom">Bottom</label>
+            </div>
+            <div class="role-option" onclick="selectRole('vers')">
+              <input type="radio" id="roleVers" name="role" value="vers">
+              <label for="roleVers">Versatile</label>
+            </div>
+            <div class="role-option" onclick="selectRole('side')">
+              <input type="radio" id="roleSide" name="role" value="side">
+              <label for="roleSide">Side</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="regPreferences">Preferences</label>
+          <select id="regPreferences" required>
+            <option value="">Select your preference</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="vers">Versatile</option>
+            <option value="side">Side</option>
+            <option value="none">No preference</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="regBio">Bio</label>
+          <textarea id="regBio" placeholder="Tell others about yourself"></textarea>
+        </div>
+        
+        <button onclick="registerUser()">Complete Registration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal" id="forgotPasswordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Forgot Password</h2>
+        <button class="close-modal" onclick="closeModal('forgotPasswordModal')">×</button>
+      </div>
+      <p>Enter your email address and we'll send you a link to reset your password.</p>
+      <div class="input-group">
+        <input id="forgotPasswordEmail" type="email" placeholder="Your email address" required>
+      </div>
+      <button onclick="resetPassword()">Send Reset Link</button>
+    </div>
+  </div>
+
+  <!-- Email Simulation Modal -->
+  <div class="modal" id="emailSimulationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Password Reset Email</h2>
+        <button class="close-modal" onclick="closeModal('emailSimulationModal')">×</button>
+      </div>
+      <div class="email-simulation">
+        <div class="email-header">
+          <h3>ConnectMe Pro</h3>
+          <p>Password Reset Request</p>
+        </div>
+        <p>We received a request to reset your ConnectMe password. Click the link below to reset it:</p>
+        <a href="#" class="reset-link" onclick="showResetPasswordPage(); return false;">Reset Your Password</a>
+        <p>If you didn't request this, you can ignore this email.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Password Page -->
+  <div class="modal" id="resetPasswordPage">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Reset Password</h2>
+        <button class="close-modal" onclick="closeModal('resetPasswordPage')">×</button>
+      </div>
+      <div class="input-group">
+        <label for="newResetPassword">New Password</label>
+        <input id="newResetPassword" type="password" placeholder="Enter new password" required>
+      </div>
+      <div class="input-group">
+        <label for="confirmResetPassword">Confirm New Password</label>
+        <input id="confirmResetPassword" type="password" placeholder="Confirm new password" required>
+      </div>
+      <button onclick="completePasswordReset()">Update Password</button>
+    </div>
+  </div>
+
+  <!-- Main App Pages -->
+  <section class="page" id="homePage">
+    <div class="scrollable-content">
+      <div class="home-header">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search for people...">
+        </div>
+        <div class="filter-options">
+          <button class="filter-option active" onclick="filterProfiles('all')">All</button>
+          <button class="filter-option" onclick="filterProfiles('online')">Online</button>
+          <button class="filter-option" onclick="filterProfiles('nearby')">Nearby</button>
+          <button class="filter-option" onclick="filterProfiles('verified')">Verified</button>
+          <button class="filter-option" onclick="filterProfiles('ai')">AI Matches</button>
+        </div>
+      </div>
+      
+      <div class="profile-grid-container">
+        <div class="profile-grid" id="profileGrid"></div>
+      </div>
+    </div>
+    
+    <!-- Floating action button -->
+    <div class="fab" onclick="openQuickMatchModal()">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 7l6 6m-6-6l-6 6m6-6v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2z"></path>
+      </svg>
+    </div>
+  </section>
+
+  <section class="page" id="messagesPage">
+    <div class="scrollable-content">
+      <div class="messages-header">
+        <h2 class="messages-title">Messages</h2>
+      </div>
+      <div class="chat-list" id="chatList"></div>
+    </div>
+  </section>
+
+  <section class="page" id="chatPage">
+    <div class="scrollable-content">
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackFromChat()">←</button>
+        <div class="chat-user">
+          <img class="chat-user-image" id="chatUserImage" src="https://randomuser.me/api/portraits/men/41.jpg" alt="User">
+          <div class="chat-user-info">
+            <h3 id="chatUserName">Jay</h3>
+            <p id="chatUserStatus">Online</p>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="chat-action-btn" onclick="toggleChatMenu()">⋮</button>
+          <div class="chat-action-menu" id="chatActionMenu">
+            <div class="chat-action-item" onclick="muteNotifications()">
+              <span id="muteText">Mute Notifications</span>
+            </div>
+            <div class="chat-action-item" onclick="viewCompatibility()">
+              <span>View Compatibility</span>
+            </div>
+            <div class="chat-action-item" onclick="blockUser()">
+              <span>Block User</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-box" id="chatBox"></div>
+      
+      <div class="chat-input-container">
+        <button class="emoji-btn">😊</button>
+        <button class="image-upload-btn" onclick="document.getElementById('imageUpload').click()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
+            <line x1="16" y1="5" x2="22" y2="5"></line>
+            <line x1="19" y1="2" x2="19" y2="8"></line>
+            <circle cx="9" cy="9" r="2"></circle>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+          </svg>
+        </button>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none" onchange="handleImageUpload()">
+        <input class="chat-input" id="chatInput" placeholder="Type a message..." onkeypress="handleChatInputKeyPress(event)">
+        <button class="send-button" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M22 2L11 13"></path>
+            <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="profilePage">
+    <div class="scrollable-content">
+      <div class="profile-header">
+        <img class="profile-header-image" id="profileViewImage" src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile">
+        <div class="profile-actions-header">
+          <button class="back-button" onclick="goBackFromProfile()">←</button>
+          <button class="action-button" onclick="viewProfileAR()">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+            </svg>
+            AR View
+          </button>
+        </div>
+        <div class="profile-header-content">
+          <h1 class="profile-name-large" id="profileViewName">Jay</h1>
+          <span class="profile-age" id="profileViewAge">23</span>
+        </div>
+      </div>
+      
+      <div class="profile-details-section">
+        <div class="detail-item">
+          <div class="detail-label">Role</div>
+          <div class="detail-value">
+            <span class="role-display top-badge" id="profileViewRole">Top</span>
+            <span class="role-display ai-match-badge" id="profileViewAiMatch" style="display: none;">AI Match 92%</span>
+            <span class="role-display verified-badge" id="profileViewVerified" style="display: none;">Verified</span>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">Preferences</div>
+          <div class="detail-value" id="profileViewPreferences">Bottom</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">About</div>
+          <div class="detail-value" id="profileViewBio">Looking for someone to explore the city with</div>
+        </div>
+        
+        <div class="detail-item" id="profileViewCompatibility" style="display: none;">
+          <div class="detail-label">Compatibility</div>
+          <div class="compatibility-score">
+            <div class="score-circle">
+              <div class="score-value" id="compatibilityScore">92%</div>
+            </div>
+            <div class="score-details">
+              <div class="score-factor">
+                <div class="score-factor-name">Interests</div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 85%"></div>
+                </div>
+              </div>
+              <div class="score-factor">
+                <div class="score-factor-name">Values</div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 92%"></div>
+                </div>
+              </div>
+              <div class="score-factor">
+                <div class="score-factor-name">Personality</div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 78%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <button class="action-button" onclick="startChatFromProfile()">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Message
+          </button>
+          <button class="action-button" onclick="likeProfile()">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+            </svg>
+            Tap
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="settingsPage">
+    <div class="scrollable-content">
+      <div class="settings-container">
+        <h2 class="settings-title">Settings</h2>
+        
+        <div class="settings-section">
+          <h3 class="section-title">Account</h3>
+          <div class="settings-item" onclick="openEditProfileModal()">
+            <span class="settings-item-label">Edit Profile</span>
+            <span>→</span>
+          </div>
+          <div class="settings-item" onclick="openChangePasswordModal()">
+            <span class="settings-item-label">Change Password</span>
+            <span>→</span>
+          </div>
+          <div class="settings-item" onclick="openVerificationModal()">
+            <span class="settings-item-label">Profile Verification</span>
+            <span>→</span>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="section-title">Privacy & Safety</h3>
+          <div class="settings-item">
+            <span class="settings-item-label">Show Online Status</span>
+            <label class="toggle-switch">
+              <input type="checkbox" checked id="onlineStatusToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <span class="settings-item-label">Show Distance</span>
+            <label class="toggle-switch">
+              <input type="checkbox" checked id="distanceToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-item" onclick="showBlockedUsers()">
+            <span class="settings-item-label">Blocked Users</span>
+            <span>→</span>
+          </div>
+          <div class="settings-item" onclick="showLikesPage()">
+            <span class="settings-item-label">View Who Liked You</span>
+            <span>→</span>
+          </div>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Likes Page -->
+  <section class="page" id="likesPage">
+    <div class="scrollable-content">
+      <div class="messages-header">
+        <button class="back-button" onclick="showPage('settingsPage')">←</button>
+        <h2 class="messages-title">Who Liked You</h2>
+      </div>
+      <div class="likes-container" id="likesList"></div>
+    </div>
+  </section>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal" id="editProfileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Profile</h2>
+        <button class="close-modal" onclick="closeModal('editProfileModal')">×</button>
+      </div>
+      <div class="edit-profile-form">
+        <div class="input-group">
+          <label for="editName">Name</label>
+          <input id="editName" type="text" placeholder="Your name" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="editAge">Age</label>
+          <input id="editAge" type="number" min="18" max="99" placeholder="Your age" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="editPreferences">Preferences</label>
+          <select id="editPreferences" required>
+            <option value="">Select your preference</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="vers">Versatile</option>
+            <option value="side">Side</option>
+            <option value="none">No preference</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="editBio">Bio</label>
+          <textarea id="editBio" placeholder="Tell others about yourself"></textarea>
+        </div>
+        
+        <button onclick="saveProfileChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal" id="changePasswordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Change Password</h2>
+        <button class="close-modal" onclick="closeModal('changePasswordModal')">×</button>
+      </div>
+      <div class="edit-profile-form">
+        <div class="input-group">
+          <label for="currentPassword">Current Password</label>
+          <input id="currentPassword" type="password" placeholder="Current password" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="newPassword">New Password</label>
+          <input id="newPassword" type="password" placeholder="New password" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input id="confirmPassword" type="password" placeholder="Confirm new password" required>
+        </div>
+        
+        <button onclick="changePassword()">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Modal -->
+  <div class="modal" id="verificationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Profile Verification</h2>
+        <button class="close-modal" onclick="closeModal('verificationModal')">×</button>
+      </div>
+      <div class="verification-container">
+        <p>Get verified to increase your matches and build trust with other users.</p>
+        
+        <div class="verification-steps">
+          <div class="verification-step">
+            <div class="verification-step-number">1</div>
+            <div>Record a short video saying the random phrase shown below</div>
+          </div>
+          <div class="verification-step">
+            <div class="verification-step-number">2</div>
+            <div>Our AI will verify your identity matches your profile photos</div>
+          </div>
+          <div class="verification-step">
+            <div class="verification-step-number">3</div>
+            <div>Get your verified badge instantly</div>
+          </div>
+        </div>
+        
+        <div class="verification-video">
+          <div id="verificationPhrase">"ConnectMe verification code: 7H9K2M"</div>
+        </div>
+        
+        <button onclick="startVerification()">Start Video Verification</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Match Modal -->
+  <div class="modal" id="quickMatchModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Quick Match</h2>
+        <button class="close-modal" onclick="closeModal('quickMatchModal')">×</button>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <div style="width: 200px; height: 200px; border-radius: 50%; background: var(--bg-card); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="var(--primary)" stroke-width="2">
+            <path d="M14 7l6 6m-6-6l-6 6m6-6v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2z"></path>
+          </svg>
+        </div>
+        <p>Find your next match instantly!</p>
+        <button onclick="findQuickMatch()" style="margin-top: 20px;">Find Match</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="bottomNav">
+    <a class="nav-item" onclick="showPage('homePage')">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </span>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" onclick="showPage('messagesPage')">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </span>
+      <span>Messages</span>
+    </a>
+    <a class="nav-item" onclick="openMapPage()">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+      </span>
+      <span>Explore</span>
+    </a>
+    <a class="nav-item" onclick="showPage('settingsPage')">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </span>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <script>
+    // Sample data for profiles
+    const sampleProfiles = [
+      {
+        id: 1,
+        name: "Alex",
+        age: 25,
+        role: "top",
+        preferences: "bottom",
+        bio: "Fitness enthusiast and food lover",
+        image: "https://randomuser.me/api/portraits/men/32.jpg",
+        online: true,
+        verified: true,
+        aiMatch: 92
+      },
+      {
+        id: 2,
+        name: "Jordan",
+        age: 28,
+        role: "vers",
+        preferences: "vers",
+        bio: "Artist and traveler",
+        image: "https://randomuser.me/api/portraits/women/44.jpg",
+        online: false,
+        verified: false,
+        aiMatch: 85
+      },
+      {
+        id: 3,
+        name: "Taylor",
+        age: 23,
+        role: "bottom",
+        preferences: "top",
+        bio: "Music producer and DJ",
+        image: "https://randomuser.me/api/portraits/men/67.jpg",
+        online: true,
+        verified: true,
+        aiMatch: 78
+      },
+      {
+        id: 4,
+        name: "Casey",
+        age: 30,
+        role: "side",
+        preferences: "none",
+        bio: "Bookworm and coffee addict",
+        image: "https://randomuser.me/api/portraits/women/63.jpg",
+        online: false,
+        verified: false,
+        aiMatch: 65
+      },
+      {
+        id: 5,
+        name: "Riley",
+        age: 26,
+        role: "top",
+        preferences: "bottom",
+        bio: "Tech geek and gamer",
+        image: "https://randomuser.me/api/portraits/men/85.jpg",
+        online: true,
+        verified: true,
+        aiMatch: 89
+      },
+      {
+        id: 6,
+        name: "Morgan",
+        age: 29,
+        role: "vers",
+        preferences: "vers",
+        bio: "Outdoor adventurer",
+        image: "https://randomuser.me/api/portraits/women/72.jpg",
+        online: false,
+        verified: true,
+        aiMatch: 91
+      }
+    ];
+
+    // Sample data for chats
+    const sampleChats = [
+      {
+        id: 1,
+        name: "Alex",
+        image: "https://randomuser.me/api/portraits/men/32.jpg",
+        lastMessage: "Hey, how are you doing?",
+        time: "2h ago",
+        unread: 3
+      },
+      {
+        id: 2,
+        name: "Jordan",
+        image: "https://randomuser.me/api/portraits/women/44.jpg",
+        lastMessage: "Let's meet this weekend!",
+        time: "1d ago",
+        unread: 0
+      },
+      {
+        id: 3,
+        name: "Taylor",
+        image: "https://randomuser.me/api/portraits/men/67.jpg",
+        lastMessage: "I sent you the track I was working on",
+        time: "3d ago",
+        unread: 0
+      }
+    ];
+
+    // Sample data for likes
+    const sampleLikes = [
+      {
+        id: 1,
+        name: "Alex",
+        image: "https://randomuser.me/api/portraits/men/32.jpg",
+        time: "2h ago"
+      },
+      {
+        id: 2,
+        name: "Jordan",
+        image: "https://randomuser.me/api/portraits/women/44.jpg",
+        time: "1d ago"
+      },
+      {
+        id: 3,
+        name: "Taylor",
+        image: "https://randomuser.me/api/portraits/men/67.jpg",
+        time: "3d ago"
+      }
+    ];
+
+    // Sample chat messages
+    const sampleMessages = [
+      {
+        sender: "other",
+        text: "Hey there! How's it going?",
+        time: "10:30 AM",
+        read: true
+      },
+      {
+        sender: "me",
+        text: "I'm good! Just finished work for the day",
+        time: "10:32 AM",
+        read: true
+      },
+      {
+        sender: "other",
+        text: "Nice! Want to grab coffee this weekend?",
+        time: "10:33 AM",
+        read: true
+      },
+      {
+        sender: "me",
+        text: "Sure, that sounds great!",
+        time: "10:35 AM",
+        read: true
+      },
+      {
+        sender: "other",
+        text: "Perfect! How about Saturday at 2pm?",
+        time: "10:36 AM",
+        read: false
+      }
+    ];
+
+    // Current user data
+    let currentUser = {
+      name: "User",
+      email: "",
+      role: "",
+      preferences: "",
+      bio: "",
+      verified: false
+    };
+
+    // Current page state
+    let currentPage = "";
+    let currentChat = null;
+    let currentProfileView = null;
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide all pages initially
+      document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
+      });
+      
+      // Show splash screen first
+      setTimeout(() => {
+        showPage('loginPage');
+      }, 2500);
+      
+      // Load sample data
+      loadProfiles();
+      loadChats();
+      loadLikes();
+    });
+
+    // Page navigation functions
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
+      });
+      
+      // Show the requested page
+      document.getElementById(pageId).style.display = 'flex';
+      currentPage = pageId;
+      
+      // Show/hide bottom nav based on page
+      if (pageId === 'homePage' || pageId === 'messagesPage' || pageId === 'settingsPage' || pageId === 'likesPage') {
+        document.getElementById('bottomNav').style.display = 'flex';
+        
+        // Set active nav item
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        if (pageId === 'homePage') {
+          document.querySelectorAll('.nav-item')[0].classList.add('active');
+        } else if (pageId === 'messagesPage') {
+          document.querySelectorAll('.nav-item')[1].classList.add('active');
+        } else if (pageId === 'settingsPage' || pageId === 'likesPage') {
+          document.querySelectorAll('.nav-item')[3].classList.add('active');
+        }
+      } else {
+        document.getElementById('bottomNav').style.display = 'none';
+      }
+      
+      // Scroll to top
+      if (document.querySelector(`#${pageId} .scrollable-content`)) {
+        document.querySelector(`#${pageId} .scrollable-content`).scrollTop = 0;
+      }
+    }
+
+    function goBackFromChat() {
+      showPage('messagesPage');
+    }
+
+    function goBackFromProfile() {
+      showPage('homePage');
+    }
+
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    function openForgotPasswordModal() {
+      closeModal('loginPage');
+      openModal('forgotPasswordModal');
+    }
+
+    function openRegisterModal() {
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const name = document.getElementById('regName').value;
+      
+      // Simple validation
+      if (!email || !password || !name) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      currentUser.email = email;
+      currentUser.name = name;
+      
+      openModal('registerModal');
+    }
+
+    function openEditProfileModal() {
+      // Populate fields with current user data
+      document.getElementById('editName').value = currentUser.name;
+      document.getElementById('editAge').value = 25; // Sample age
+      document.getElementById('editPreferences').value = currentUser.preferences || '';
+      document.getElementById('editBio').value = currentUser.bio || '';
+      
+      openModal('editProfileModal');
+    }
+
+    function openChangePasswordModal() {
+      openModal('changePasswordModal');
+    }
+
+    function openVerificationModal() {
+      openModal('verificationModal');
+    }
+
+    function openQuickMatchModal() {
+      openModal('quickMatchModal');
+    }
+
+    function toggleChatMenu() {
+      const menu = document.getElementById('chatActionMenu');
+      menu.classList.toggle('show');
+    }
+
+    // Data loading functions
+    function loadProfiles() {
+      const profileGrid = document.getElementById('profileGrid');
+      profileGrid.innerHTML = '';
+      
+      sampleProfiles.forEach(profile => {
+        const profileCard = document.createElement('div');
+        profileCard.className = 'profile-card';
+        profileCard.innerHTML = `
+          <img class="profile-image" src="${profile.image}" alt="${profile.name}">
+          <div class="profile-badge">
+            <span class="status-dot ${profile.online ? 'online' : 'offline'}"></span>
+            <span>${profile.online ? 'Online' : 'Offline'}</span>
+          </div>
+          ${profile.role === 'top' ? '<div class="role-badge top-badge">Top</div>' : ''}
+          ${profile.role === 'bottom' ? '<div class="role-badge bottom-badge">Bottom</div>' : ''}
+          ${profile.role === 'vers' ? '<div class="role-badge vers-badge">Vers</div>' : ''}
+          ${profile.role === 'side' ? '<div class="role-badge side-badge">Side</div>' : ''}
+          ${profile.verified ? '<div class="role-badge verified-badge">Verified</div>' : ''}
+          ${profile.aiMatch ? `<div class="role-badge ai-match-badge">AI Match ${profile.aiMatch}%</div>` : ''}
+          <div class="profile-info">
+            <div class="profile-name">${profile.name}, ${profile.age}</div>
+            <div class="profile-details">
+              <span>${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)}</span>
+              <span>Pref: ${profile.preferences.charAt(0).toUpperCase() + profile.preferences.slice(1)}</span>
+            </div>
+            <div class="profile-actions">
+              <button class="action-btn message-btn" onclick="startChat(${profile.id})">Message</button>
+              <button class="action-btn like-btn" onclick="likeProfile(${profile.id})">Like</button>
+            </div>
+          </div>
+        `;
+        
+        profileCard.onclick = function() {
+          viewProfile(profile.id);
+        };
+        
+        profileGrid.appendChild(profileCard);
+      });
+    }
+
+    function loadChats() {
+      const chatList = document.getElementById('chatList');
+      chatList.innerHTML = '';
+      
+      sampleChats.forEach(chat => {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.innerHTML = `
+          <img class="chat-item-image" src="${chat.image}" alt="${chat.name}">
+          <div class="chat-item-info">
+            <div class="chat-item-name">${chat.name}</div>
+            <div class="chat-item-preview">${chat.lastMessage}</div>
+          </div>
+          <div class="chat-item-time">${chat.time}</div>
+          ${chat.unread > 0 ? `<div class="chat-item-unread">${chat.unread}</div>` : ''}
+        `;
+        
+        chatItem.onclick = function() {
+          openChat(chat.id);
+        };
+        
+        chatList.appendChild(chatItem);
+      });
+    }
+
+    function loadLikes() {
+      const likesList = document.getElementById('likesList');
+      likesList.innerHTML = '';
+      
+      sampleLikes.forEach(like => {
+        const likeItem = document.createElement('div');
+        likeItem.className = 'like-item';
+        likeItem.innerHTML = `
+          <img class="like-item-image" src="${like.image}" alt="${like.name}">
+          <div class="like-item-info">
+            <div class="like-item-name">${like.name}</div>
+            <div class="like-item-time">${like.time}</div>
+          </div>
+        `;
+        
+        likeItem.onclick = function() {
+          viewProfile(like.id);
+        };
+        
+        likesList.appendChild(likeItem);
+      });
+    }
+
+    function openChat(chatId) {
+      const chat = sampleChats.find(c => c.id === chatId);
+      if (!chat) return;
+      
+      currentChat = chat;
+      
+      // Set chat header info
+      document.getElementById('chatUserName').textContent = chat.name;
+      document.getElementById('chatUserImage').src = chat.image;
+      
+      // Load messages
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = '';
+      
+      sampleMessages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${msg.sender}`;
+        
+        messageDiv.innerHTML = `
+          <div class="chat-message-content">
+            ${msg.text}
+            <div class="chat-time">${msg.time} ${msg.sender === 'me' && msg.read ? '<span class="read-receipt">✓✓</span>' : ''}</div>
+          </div>
+        `;
+        
+        chatBox.appendChild(messageDiv);
+      });
+      
+      // Scroll to bottom
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      showPage('chatPage');
+    }
+
+    function viewProfile(profileId) {
+      const profile = sampleProfiles.find(p => p.id === profileId);
+      if (!profile) return;
+      
+      currentProfileView = profile;
+      
+      // Set profile info
+      document.getElementById('profileViewName').textContent = profile.name;
+      document.getElementById('profileViewAge').textContent = profile.age;
+      document.getElementById('profileViewImage').src = profile.image;
+      
+      // Set role badge
+      const roleBadge = document.getElementById('profileViewRole');
+      roleBadge.textContent = profile.role.charAt(0).toUpperCase() + profile.role.slice(1);
+      roleBadge.className = 'role-display ';
+      
+      if (profile.role === 'top') roleBadge.classList.add('top-badge');
+      else if (profile.role === 'bottom') roleBadge.classList.add('bottom-badge');
+      else if (profile.role === 'vers') roleBadge.classList.add('vers-badge');
+      else if (profile.role === 'side') roleBadge.classList.add('side-badge');
+      
+      // Set other badges
+      document.getElementById('profileViewVerified').style.display = profile.verified ? 'inline-block' : 'none';
+      document.getElementById('profileViewAiMatch').style.display = profile.aiMatch ? 'inline-block' : 'none';
+      if (profile.aiMatch) {
+        document.getElementById('profileViewAiMatch').textContent = `AI Match ${profile.aiMatch}%`;
+      }
+      
+      // Set other details
+      document.getElementById('profileViewPreferences').textContent = profile.preferences.charAt(0).toUpperCase() + profile.preferences.slice(1);
+      document.getElementById('profileViewBio').textContent = profile.bio;
+      
+      // Hide compatibility section by default
+      document.getElementById('profileViewCompatibility').style.display = 'none';
+      
+      showPage('profilePage');
+    }
+
+    function viewCompatibility() {
+      // Show compatibility section
+      document.getElementById('profileViewCompatibility').style.display = 'block';
+      document.getElementById('compatibilityScore').textContent = currentProfileView.aiMatch + '%';
+      
+      // Scroll to compatibility section
+      document.querySelector('.profile-details-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // User action functions
+    function loginUser() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      // Simple validation
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+      
+      // Simulate login
+      currentUser.email = email;
+      
+      // Show main app
+      showPage('homePage');
+    }
+
+    function registerUser() {
+      const age = document.getElementById('regAge').value;
+      const role = document.querySelector('input[name="role"]:checked')?.value;
+      const preferences = document.getElementById('regPreferences').value;
+      const bio = document.getElementById('regBio').value;
+      
+      // Simple validation
+      if (!age || !role || !preferences) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      // Update current user
+      currentUser.age = age;
+      currentUser.role = role;
+      currentUser.preferences = preferences;
+      currentUser.bio = bio;
+      
+      // Close modal and show login
+      closeModal('registerModal');
+      showPage('loginPage');
+      
+      alert('Registration complete! Please login with your credentials.');
+    }
+
+    function saveProfileChanges() {
+      const name = document.getElementById('editName').value;
+      const age = document.getElementById('editAge').value;
+      const preferences = document.getElementById('editPreferences').value;
+      const bio = document.getElementById('editBio').value;
+      
+      // Update current user
+      currentUser.name = name;
+      currentUser.age = age;
+      currentUser.preferences = preferences;
+      currentUser.bio = bio;
+      
+      // Close modal
+      closeModal('editProfileModal');
+      
+      alert('Profile updated successfully!');
+    }
+
+    function changePassword() {
+      const currentPass = document.getElementById('currentPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirmPass = document.getElementById('confirmPassword').value;
+      
+      // Simple validation
+      if (!currentPass || !newPass || !confirmPass) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (newPass !== confirmPass) {
+        alert('New passwords do not match');
+        return;
+      }
+      
+      // Close modal
+      closeModal('changePasswordModal');
+      
+      alert('Password changed successfully!');
+    }
+
+    function resetPassword() {
+      const email = document.getElementById('forgotPasswordEmail').value;
+      
+      if (!email) {
+        alert('Please enter your email address');
+        return;
+      }
+      
+      // Close forgot password modal and show email simulation
+      closeModal('forgotPasswordModal');
+      openModal('emailSimulationModal');
+    }
+
+    function showResetPasswordPage() {
+      closeModal('emailSimulationModal');
+      openModal('resetPasswordPage');
+    }
+
+    function completePasswordReset() {
+      const newPass = document.getElementById('newResetPassword').value;
+      const confirmPass = document.getElementById('confirmResetPassword').value;
+      
+      if (!newPass || !confirmPass) {
+        alert('Please fill in both fields');
+        return;
+      }
+      
+      if (newPass !== confirmPass) {
+        alert('Passwords do not match');
+        return;
+      }
+      
+      // Close modal and show login
+      closeModal('resetPasswordPage');
+      showPage('loginPage');
+      
+      alert('Password reset successful! Please login with your new password.');
+    }
+
+    function startVerification() {
+      alert('Verification process started! This would open the camera in a real app.');
+    }
+
+    function findQuickMatch() {
+      closeModal('quickMatchModal');
+      alert('Finding your perfect match... This would show matching profiles in a real app.');
+    }
+
+    function startChat(profileId) {
+      event.stopPropagation();
+      const profile = sampleProfiles.find(p => p.id === profileId);
+      if (!profile) return;
+      
+      // In a real app, this would create a new chat or open existing one
+      alert(`Starting chat with ${profile.name}`);
+    }
+
+    function startChatFromProfile() {
+      if (!currentProfileView) return;
+      startChat(currentProfileView.id);
+    }
+
+    function likeProfile(profileId) {
+      event.stopPropagation();
+      const profile = sampleProfiles.find(p => p.id === profileId);
+      if (!profile) return;
+      
+      alert(`You liked ${profile.name}!`);
+    }
+
+    function muteNotifications() {
+      alert('Notifications muted for this chat');
+      toggleChatMenu();
+    }
+
+    function blockUser() {
+      if (confirm('Are you sure you want to block this user?')) {
+        alert('User blocked');
+        showPage('messagesPage');
+      }
+      toggleChatMenu();
+    }
+
+    function viewProfileAR() {
+      alert('Opening AR view of profile');
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to log out?')) {
+        // Reset current user
+        currentUser = {
+          name: "User",
+          email: "",
+          role: "",
+          preferences: "",
+          bio: "",
+          verified: false
+        };
+        
+        // Show login page
+        showPage('loginPage');
+      }
+    }
+
+    function showLikesPage() {
+      showPage('likesPage');
+    }
+
+    function openMapPage() {
+      alert('Map/Explore feature would open here');
+    }
+
+    function filterProfiles(filter) {
+      // Update active filter button
+      document.querySelectorAll('.filter-option').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // In a real app, this would filter the profiles
+      alert(`Filtering by: ${filter}`);
+    }
+
+    function selectRole(role) {
+      document.querySelectorAll('.role-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.role-option').classList.add('selected');
+    }
+
+    function handleChatInputKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      // Add message to chat
+      const chatBox = document.getElementById('chatBox');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'chat-message me';
+      
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      messageDiv.innerHTML = `
+        <div class="chat-message-content">
+          ${message}
+          <div class="chat-time">${timeString} <span class="read-receipt">✓✓</span></div>
+        </div>
+      `;
+      
+      chatBox.appendChild(messageDiv);
+      input.value = '';
+      
+      // Scroll to bottom
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      // Simulate reply after 1-3 seconds
+      setTimeout(() => {
+        const replies = [
+          "That's interesting!",
+          "Tell me more about that",
+          "I'd love to hear more",
+          "Sounds great!",
+          "When can we meet?",
+          "I was thinking the same thing"
+        ];
+        
+        const reply = replies[Math.floor(Math.random() * replies.length)];
+        const replyDiv = document.createElement('div');
+        replyDiv.className = 'chat-message other';
+        
+        replyDiv.innerHTML = `
+          <div class="chat-message-content">
+            ${reply}
+            <div class="chat-time">${timeString}</div>
+          </div>
+        `;
+        
+        chatBox.appendChild(replyDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 1000 + Math.random() * 2000);
+    }
+
+    function handleImageUpload() {
+      const fileInput = document.getElementById('imageUpload');
+      if (!fileInput.files.length) return;
+      
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const chatBox = document.getElementById('chatBox');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message me';
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+          <div class="chat-message-content">
+            <img class="chat-image" src="${e.target.result}" alt="Sent image">
+            <div class="chat-time">${timeString} <span class="read-receipt">✓✓</span></div>
+          </div>
+        `;
+        
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        
+        // Clear file input
+        fileInput.value = '';
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
+
