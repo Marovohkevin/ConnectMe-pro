@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile View | ConnectMe Pro</title>
+  <style>
+    :root {
+      --primary: #7F5AF0;
+      --primary-dark: #6C4BD1;
+      --primary-light: #9B7AFF;
+      --secondary: #2CB67D;
+      --accent: #FF8906;
+      --bg-dark: #16161A;
+      --bg-darker: #0E0E10;
+      --bg-card: #242629;
+      --text-light: #FFFFFE;
+      --text-muted: #94A1B2;
+      --msg-me: #7F5AF0;
+      --msg-other: #2A2A3A;
+      --online: #2CB67D;
+      --offline: #72757E;
+      --danger: #EF4565;
+      --success: #2CB67D;
+      --warning: #FF8906;
+      --info: #7F5AF0;
+      
+      --top-color: #7F5AF0;
+      --bottom-color: #2CB67D;
+      --vers-color: #FF8906;
+      --side-color: #72757E;
+      
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .scrollable-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 80px;
+      scroll-behavior: smooth;
+    }
+    
+    /* Profile View Page */
+    .profile-view {
+      background: var(--bg-dark);
+    }
+    
+    .profile-header {
+      position: relative;
+      height: 380px;
+      overflow: hidden;
+    }
+    
+    .profile-header-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .profile-header:hover .profile-header-image {
+      transform: scale(1.05);
+    }
+    
+    .profile-header-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 25px 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    
+    .profile-name-age {
+      flex: 1;
+    }
+    
+    .profile-name-large {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .verified-icon {
+      margin-left: 8px;
+      color: var(--accent);
+      display: none;
+    }
+    
+    .profile-age {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+    
+    .profile-distance {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    
+    .distance-icon {
+      margin-right: 5px;
+    }
+    
+    .profile-status {
+      display: flex;
+      align-items: center;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    
+    .online {
+      background: var(--online);
+      box-shadow: 0 0 10px var(--online);
+    }
+    
+    .offline {
+      background: var(--offline);
+    }
+    
+    .profile-actions-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+    
+    .back-button {
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(5px);
+    }
+    
+    .back-button:hover {
+      background: rgba(127, 90, 240, 0.5);
+      transform: scale(1.1);
+    }
+    
+    .action-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(127, 90, 240, 0.4);
+    }
+    
+    .action-button.secondary {
+      background: transparent;
+      border: 2px solid var(--primary);
+    }
+    
+    .action-button.secondary:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    .action-button.danger {
+      background: var(--danger);
+      box-shadow: 0 4px 15px rgba(239, 69, 101, 0.3);
+    }
+    
+    .action-button.danger:hover {
+      box-shadow: 0 6px 20px rgba(239, 69, 101, 0.4);
+    }
+    
+    .profile-details-section {
+      padding: 20px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-title-icon {
+      margin-right: 8px;
+    }
+    
+    .detail-item {
+      margin-bottom: 20px;
+    }
+    
+    .detail-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .detail-value {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    
+    .role-display {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .top-badge {
+      background: var(--top-color);
+      color: white;
+    }
+    
+    .bottom-badge {
+      background: var(--bottom-color);
+      color: white;
+    }
+    
+    .vers-badge {
+      background: var(--vers-color);
+      color: black;
+    }
+    
+    .side-badge {
+      background: var(--side-color);
+      color: white;
+    }
+    
+    .ai-match-badge {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .verified-badge {
+      background: var(--accent);
+      color: black;
+    }
+    
+    /* Photo Gallery */
+    .photo-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .photo-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .photo-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .photo-count {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 8px;
+      border-bottom-left-radius: 8px;
+      font-size: 12px;
+    }
+    
+    /* Interests */
+    .interests-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .interest-tag {
+      background: rgba(127, 90, 240, 0.2);
+      color: var(--primary-light);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    
+    /* Compatibility Score */
+    .compatibility-score {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 12px;
+    }
+    
+    .score-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) 0% 85%, var(--bg-dark) 85% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      position: relative;
+    }
+    
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: var(--bg-card);
+      border-radius: 50%;
+    }
+    
+    .score-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      position: relative;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .score-details {
+      flex: 1;
+    }
+    
+    .score-factor {
+      margin-bottom: 12px;
+    }
+    
+    .score-factor-name {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .score-factor-value {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .score-factor-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .score-factor-progress {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 85%;
+    }
+    
+    /* Profile Actions */
+    .profile-actions {
+      display: flex;
+      gap: 12px;
+      padding: 0 20px 20px;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-dark);
+      z-index: 5;
+    }
+    
+    .profile-actions button {
+      flex: 1;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      background: var(--bg-card);
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 8px 12px;
+      min-width: 70px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .nav-icon {
+      margin-bottom: 4px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .nav-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      transform: translateY(-5px);
+    }
+    
+    .nav-item.active .nav-icon {
+      transform: scale(1.2);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s forwards;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: modalIn 0.3s forwards;
+    }
+    
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .close-modal:hover {
+      color: var(--text-light);
+      transform: rotate(90deg);
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .profile-header {
+        height: 320px;
+      }
+      
+      .profile-name-large {
+        font-size: 24px;
+      }
+      
+      .profile-age {
+        font-size: 16px;
+      }
+      
+      .profile-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .score-circle {
+        width: 80px;
+        height: 80px;
+        margin-right: 15px;
+      }
+      
+      .score-circle::before {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .score-value {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="page profile-view" id="profilePage">
+    <div class="scrollable-content">
+      <div class="profile-header">
+        <img class="profile-header-image" id="profileViewImage" src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile">
+        
+        <div class="profile-actions-header">
+          <button class="back-button" onclick="goBackFromProfile()">←</button>
+          <button class="action-button" onclick="viewProfileAR()">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+            </svg>
+            AR View
+          </button>
+        </div>
+        
+        <div class="profile-header-content">
+          <div class="profile-name-age">
+            <h1 class="profile-name-large" id="profileViewName">
+              Jay
+              <span class="verified-icon" id="verifiedIcon">✓</span>
+            </h1>
+            <span class="profile-age" id="profileViewAge">23</span>
+            <div class="profile-distance">
+              <span class="distance-icon">📍</span>
+              <span id="profileDistance">2 miles away</span>
+            </div>
+          </div>
+          <div class="profile-status" id="profileStatus">
+            <span class="status-dot online"></span>
+            <span>Online Now</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-details-section">
+        <div class="detail-item">
+          <div class="section-title">
+            <span class="section-title-icon">👤</span>
+            <span>About</span>
+          </div>
+          <div class="detail-value" id="profileViewBio">
+            Fitness trainer and nutrition coach. Love hiking, cooking healthy meals, and exploring new coffee shops. Looking for someone to share adventures with!
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="section-title">
+            <span class="section-title-icon">💖</span>
+            <span>Looking For</span>
+          </div>
+          <div class="detail-value" id="profileViewLookingFor">
+            Long-term relationship, but open to new connections
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="section-title">
+            <span class="section-title-icon">🌈</span>
+            <span>Role & Preferences</span>
+          </div>
+          <div class="detail-value">
+            <span class="role-display top-badge" id="profileViewRole">Top</span>
+            <span class="role-display ai-match-badge" id="profileViewAiMatch">AI Match 92%</span>
+            <span class="role-display verified-badge" id="profileViewVerified">Verified</span>
+            <div style="margin-top: 8px;">
+              <span style="color: var(--text-muted);">Prefers:</span>
+              <span class="role-display bottom-badge" id="profileViewPreferences">Bottom</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="section-title">
+            <span class="section-title-icon">📸</span>
+            <span>Photos</span>
+          </div>
+          <div class="photo-gallery" id="profileGallery">
+            <div class="photo-item">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Profile photo">
+            </div>
+            <div class="photo-item">
+              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Hiking">
+            </div>
+            <div class="photo-item">
+              <img src="https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Coffee">
+              <div class="photo-count">+5</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="section-title">
+            <span class="section-title-icon">🎯</span>
+            <span>Interests</span>
+          </div>
+          <div class="interests-container" id="profileInterests">
+            <span class="interest-tag">Fitness</span>
+            <span class="interest-tag">Hiking</span>
+            <span class="interest-tag">Cooking</span>
+            <span class="interest-tag">Coffee</span>
+            <span class="interest-tag">Travel</span>
+            <span class="interest-tag">Yoga</span>
+          </div>
+        </div>
+        
+        <div class="detail-item" id="profileViewCompatibility">
+          <div class="section-title">
+            <span class="section-title-icon">💞</span>
+            <span>Compatibility</span>
+          </div>
+          <div class="compatibility-score">
+            <div class="score-circle">
+              <div class="score-value" id="compatibilityScore">92%</div>
+            </div>
+            <div class="score-details">
+              <div class="score-factor">
+                <div class="score-factor-name">
+                  <span>Interests</span>
+                  <span class="score-factor-value">85%</span>
+                </div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 85%"></div>
+                </div>
+              </div>
+              <div class="score-factor">
+                <div class="score-factor-name">
+                  <span>Values</span>
+                  <span class="score-factor-value">92%</span>
+                </div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 92%"></div>
+                </div>
+              </div>
+              <div class="score-factor">
+                <div class="score-factor-name">
+                  <span>Personality</span>
+                  <span class="score-factor-value">78%</span>
+                </div>
+                <div class="score-factor-bar">
+                  <div class="score-factor-progress" style="width: 78%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-actions">
+      <button class="action-button secondary" onclick="showBlockConfirm()">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+        Block
+      </button>
+      <button class="action-button" onclick="likeProfile()">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+        </svg>
+        Tap
+      </button>
+      <button class="action-button" onclick="startChatFromProfile()">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        Message
+      </button>
+    </div>
+  </section>
+
+  <!-- Block Confirmation Modal -->
+  <div class="modal" id="blockConfirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Block User</h2>
+        <button class="close-modal" onclick="closeModal('blockConfirmModal')">×</button>
+      </div>
+      <p>Are you sure you want to block <strong id="blockUserName">Jay</strong>?</p>
+      <p style="margin-top: 10px; color: var(--text-muted); font-size: 14px;">
+        You won't see each other's profiles or be able to message. This action cannot be undone.
+      </p>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="action-button secondary" onclick="closeModal('blockConfirmModal')" style="flex: 1;">Cancel</button>
+        <button class="action-button danger" onclick="blockUser()" style="flex: 1;">Block</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="bottomNav">
+    <a class="nav-item" onclick="goToHome()">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </span>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" onclick="goToMessages()">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </span>
+      <span>Messages</span>
+    </a>
+    <a class="nav-item" onclick="goToExplore()">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+      </span>
+      <span>Explore</span>
+    </a>
+    <a class="nav-item" onclick="goToProfile()">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </span>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+  <script>
+    // Current profile data
+    const currentProfile = {
+      id: 1,
+      name: "Jay",
+      age: 23,
+      role: "top",
+      preferences: "bottom",
+      bio: "Fitness trainer and nutrition coach. Love hiking, cooking healthy meals, and exploring new coffee shops. Looking for someone to share adventures with!",
+      lookingFor: "Long-term relationship, but open to new connections",
+      image: "https://randomuser.me/api/portraits/men/41.jpg",
+      online: true,
+      verified: true,
+      aiMatch: 92,
+      distance: "2 miles away",
+      interests: ["Fitness", "Hiking", "Cooking", "Coffee", "Travel", "Yoga"],
+      photos: [
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+        "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+        "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
+        "https://images.unsplash.com/photo-1485178575877-1a13bf489dfe?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
+      ]
+    };
+
+    // Initialize the profile view
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProfileData();
+    });
+
+    function loadProfileData() {
+      // Set basic info
+      document.getElementById('profileViewName').textContent = currentProfile.name;
+      document.getElementById('profileViewAge').textContent = currentProfile.age;
+      document.getElementById('profileViewImage').src = currentProfile.image;
+      document.getElementById('profileViewBio').textContent = currentProfile.bio;
+      document.getElementById('profileViewLookingFor').textContent = currentProfile.lookingFor;
+      document.getElementById('profileDistance').textContent = currentProfile.distance;
+      
+      // Set role and preferences
+      const roleBadge = document.getElementById('profileViewRole');
+      roleBadge.textContent = currentProfile.role.charAt(0).toUpperCase() + currentProfile.role.slice(1);
+      roleBadge.className = 'role-display ';
+      
+      if (currentProfile.role === 'top') roleBadge.classList.add('top-badge');
+      else if (currentProfile.role === 'bottom') roleBadge.classList.add('bottom-badge');
+      else if (currentProfile.role === 'vers') roleBadge.classList.add('vers-badge');
+      else if (currentProfile.role === 'side') roleBadge.classList.add('side-badge');
+      
+      // Set preferences badge
+      const prefBadge = document.getElementById('profileViewPreferences');
+      prefBadge.textContent = currentProfile.preferences.charAt(0).toUpperCase() + currentProfile.preferences.slice(1);
+      prefBadge.className = 'role-display ';
+      
+      if (currentProfile.preferences === 'top') prefBadge.classList.add('top-badge');
+      else if (currentProfile.preferences === 'bottom') prefBadge.classList.add('bottom-badge');
+      else if (currentProfile.preferences === 'vers') prefBadge.classList.add('vers-badge');
+      else if (currentProfile.preferences === 'side') prefBadge.classList.add('side-badge');
+      
+      // Set verification and AI match
+      document.getElementById('verifiedIcon').style.display = currentProfile.verified ? 'inline-block' : 'none';
+      document.getElementById('profileViewVerified').style.display = currentProfile.verified ? 'inline-block' : 'none';
+      document.getElementById('profileViewAiMatch').textContent = `AI Match ${currentProfile.aiMatch}%`;
+      document.getElementById('compatibilityScore').textContent = `${currentProfile.aiMatch}%`;
+      
+      // Set online status
+      const statusElement = document.getElementById('profileStatus');
+      const statusDot = statusElement.querySelector('.status-dot');
+      const statusText = statusElement.querySelector('span:last-child');
+      
+      if (currentProfile.online) {
+        statusDot.className = 'status-dot online';
+        statusText.textContent = 'Online Now';
+      } else {
+        statusDot.className = 'status-dot offline';
+        statusText.textContent = 'Offline';
+      }
+      
+      // Load interests
+      const interestsContainer = document.getElementById('profileInterests');
+      interestsContainer.innerHTML = '';
+      
+      currentProfile.interests.forEach(interest => {
+        const tag = document.createElement('span');
+        tag.className = 'interest-tag';
+        tag.textContent = interest;
+        interestsContainer.appendChild(tag);
+      });
+      
+      // Load photos (first 3)
+      const gallery = document.getElementById('profileGallery');
+      gallery.innerHTML = '';
+      
+      for (let i = 0; i < Math.min(3, currentProfile.photos.length); i++) {
+        const photoItem = document.createElement('div');
+        photoItem.className = 'photo-item';
+        photoItem.innerHTML = `
+          <img src="${currentProfile.photos[i]}" alt="Profile photo">
+          ${i === 2 && currentProfile.photos.length > 3 ? `<div class="photo-count">+${currentProfile.photos.length - 3}</div>` : ''}
+        `;
+        photoItem.onclick = function() {
+          viewPhotoGallery(i);
+        };
+        gallery.appendChild(photoItem);
+      }
+    }
+
+    function goBackFromProfile() {
+      // In a real app, this would go back to previous page
+      alert('Navigating back to previous screen');
+    }
+
+    function viewProfileAR() {
+      alert('Opening AR view - this would use device camera to show profile in augmented reality');
+    }
+
+    function startChatFromProfile() {
+      alert(`Starting chat with ${currentProfile.name}`);
+    }
+
+    function likeProfile() {
+      alert(`You tapped ${currentProfile.name}! This sends a notification to them.`);
+    }
+
+    function showBlockConfirm() {
+      document.getElementById('blockUserName').textContent = currentProfile.name;
+      openModal('blockConfirmModal');
+    }
+
+    function blockUser() {
+      alert(`${currentProfile.name} has been blocked. You won't see each other anymore.`);
+      closeModal('blockConfirmModal');
+      // In a real app, would navigate away
+      setTimeout(() => {
+        goBackFromProfile();
+      }, 1000);
+    }
+
+    function viewPhotoGallery(startIndex) {
+      alert(`Opening photo gallery starting at index ${startIndex}`);
+      // In a real app, this would open a full-screen photo gallery
+    }
+
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Navigation functions (simplified for demo)
+    function goToHome() {
+      alert('Navigating to Home');
+    }
+
+    function goToMessages() {
+      alert('Navigating to Messages');
+    }
+
+    function goToExplore() {
+      alert('Navigating to Explore');
+    }
+
+    function goToProfile() {
+      alert('Navigating to My Profile');
+    }
+  </script>
+</body>
+</html>
