@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | ConnectMe Pro</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <style>
+    :root {
+      --primary: #7F5AF0;
+      --primary-dark: #6C4BD1;
+      --primary-light: #9B7AFF;
+      --secondary: #2CB67D;
+      --accent: #FF8906;
+      --bg-dark: #16161A;
+      --bg-darker: #0E0E10;
+      --bg-card: #242629;
+      --text-light: #FFFFFE;
+      --text-muted: #94A1B2;
+      --msg-me: #7F5AF0;
+      --msg-other: #2A2A3A;
+      --online: #2CB67D;
+      --offline: #72757E;
+      --danger: #EF4565;
+      --success: #2CB67D;
+      --warning: #FF8906;
+      --info: #7F5AF0;
+      
+      /* Role colors */
+      --top-color: #7F5AF0;
+      --bottom-color: #2CB67D;
+      --vers-color: #FF8906;
+      --side-color: #72757E;
+      
+      /* Animation */
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 80px;
+    }
+    
+    .profile-header {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    
+    .profile-header-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .profile-header-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    }
+    
+    .profile-name-large {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .profile-age {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+    
+    .profile-actions-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+    
+    .back-button {
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(5px);
+    }
+    
+    .back-button:hover {
+      background: rgba(127, 90, 240, 0.5);
+      transform: scale(1.1);
+    }
+    
+    .action-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(127, 90, 240, 0.4);
+    }
+    
+    .profile-details-section {
+      padding: 20px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    
+    .detail-item {
+      margin-bottom: 16px;
+    }
+    
+    .detail-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    
+    .detail-value {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .role-display {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .top-badge {
+      background: var(--top-color);
+      color: white;
+    }
+    
+    .bottom-badge {
+      background: var(--bottom-color);
+      color: white;
+    }
+    
+    .vers-badge {
+      background: var(--vers-color);
+      color: black;
+    }
+    
+    .side-badge {
+      background: var(--side-color);
+      color: white;
+    }
+    
+    .verified-badge {
+      background: var(--accent);
+      color: black;
+    }
+    
+    .ai-match-badge {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    .logout-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      color: var(--danger);
+      border: 2px solid var(--danger);
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(239, 69, 101, 0.1);
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      background: var(--bg-card);
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 8px 12px;
+      min-width: 70px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .nav-icon {
+      margin-bottom: 4px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .nav-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      transform: translateY(-5px);
+    }
+    
+    .nav-item.active .nav-icon {
+      transform: scale(1.2);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .close-modal:hover {
+      color: var(--text-light);
+      transform: rotate(90deg);
+    }
+    
+    /* Edit Profile Form */
+    .edit-profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    
+    input, button, select, textarea {
+      width: 100%;
+      padding: 15px 20px;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    input, select, textarea {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-light);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.2);
+      background: rgba(127, 90, 240, 0.05);
+    }
+    
+    button {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .role-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .role-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .role-option:hover {
+      background: rgba(127, 90, 240, 0.1);
+    }
+    
+    .role-option.selected {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.3);
+    }
+    
+    .role-option input {
+      margin-right: 8px;
+    }
+    
+    /* Verification UI */
+    .verification-container {
+      text-align: center;
+    }
+    
+    .verification-video {
+      width: 100%;
+      height: 200px;
+      background: #000;
+      margin: 20px 0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    #videoElement {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    #verificationPhrase {
+      padding: 20px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+    
+    .verification-steps {
+      text-align: left;
+      margin: 20px 0;
+    }
+    
+    .verification-step {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .verification-step-number {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    /* Loading spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 480px) {
+      .role-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="profileContainer">
+    <div class="profile-header">
+      <img class="profile-header-image" id="profileImage" src="https://via.placeholder.com/300x300" alt="Profile">
+      <div class="profile-actions-header">
+        <button class="back-button" onclick="window.history.back()">←</button>
+        <button class="action-button" onclick="openEditProfileModal()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Edit Profile
+        </button>
+      </div>
+      <div class="profile-header-content">
+        <h1 class="profile-name-large" id="profileName">Loading...</h1>
+        <span class="profile-age" id="profileAge"></span>
+      </div>
+    </div>
+    
+    <div class="profile-details-section">
+      <div class="detail-item">
+        <div class="detail-label">Role</div>
+        <div class="detail-value">
+          <span class="role-display" id="profileRole">Loading...</span>
+          <span class="role-display verified-badge" id="profileVerified" style="display: none;">Verified</span>
+        </div>
+      </div>
+      
+      <div class="detail-item">
+        <div class="detail-label">Looking For</div>
+        <div class="detail-value" id="profilePreferences">Loading...</div>
+      </div>
+      
+      <div class="detail-item">
+        <div class="detail-label">About Me</div>
+        <div class="detail-value" id="profileBio">Loading...</div>
+      </div>
+      
+      <div class="detail-item">
+        <div class="detail-label">Location</div>
+        <div class="detail-value" id="profileLocation">Loading...</div>
+      </div>
+      
+      <div class="detail-item">
+        <div class="detail-label">Interests</div>
+        <div class="detail-value" id="profileInterests">Loading...</div>
+      </div>
+      
+      <div class="profile-actions">
+        <button class="action-button" id="verificationButton" onclick="openVerificationModal()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+          </svg>
+          Get Verified
+        </button>
+        <button class="logout-btn" onclick="logout()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a class="nav-item" onclick="window.location.href='home.html'">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </span>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" onclick="window.location.href='messages.html'">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </span>
+      <span>Messages</span>
+    </a>
+    <a class="nav-item" onclick="window.location.href='explore.html'">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+      </span>
+      <span>Explore</span>
+    </a>
+    <a class="nav-item active">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </span>
+      <span>Profile</span>
+    </a>
+  </nav>
+  
+  <!-- Edit Profile Modal -->
+  <div class="modal" id="editProfileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Profile</h2>
+        <button class="close-modal" onclick="closeModal('editProfileModal')">×</button>
+      </div>
+      <div class="edit-profile-form">
+        <div class="input-group">
+          <label for="editName">Name</label>
+          <input id="editName" type="text" placeholder="Your name">
+        </div>
+        
+        <div class="input-group">
+          <label for="editAge">Age</label>
+          <input id="editAge" type="number" min="18" max="99" placeholder="Your age">
+        </div>
+        
+        <div class="input-group">
+          <label>Role</label>
+          <div class="role-options">
+            <div class="role-option" onclick="selectRole('top')">
+              <input type="radio" id="roleTop" name="role" value="top">
+              <label for="roleTop">Top</label>
+            </div>
+            <div class="role-option" onclick="selectRole('bottom')">
+              <input type="radio" id="roleBottom" name="role" value="bottom">
+              <label for="roleBottom">Bottom</label>
+            </div>
+            <div class="role-option" onclick="selectRole('vers')">
+              <input type="radio" id="roleVers" name="role" value="vers">
+              <label for="roleVers">Versatile</label>
+            </div>
+            <div class="role-option" onclick="selectRole('side')">
+              <input type="radio" id="roleSide" name="role" value="side">
+              <label for="roleSide">Side</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="editPreferences">Looking For</label>
+          <select id="editPreferences">
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="vers">Versatile</option>
+            <option value="side">Side</option>
+            <option value="none">No preference</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="editLocation">Location</label>
+          <input id="editLocation" type="text" placeholder="Your location">
+        </div>
+        
+        <div class="input-group">
+          <label for="editBio">About Me</label>
+          <textarea id="editBio" placeholder="Tell others about yourself"></textarea>
+        </div>
+        
+        <div class="input-group">
+          <label for="editInterests">Interests (comma separated)</label>
+          <input id="editInterests" type="text" placeholder="Your interests">
+        </div>
+        
+        <div class="input-group">
+          <label for="profilePhotoUpload">Profile Photo</label>
+          <input type="file" id="profilePhotoUpload" accept="image/*">
+        </div>
+        
+        <button onclick="saveProfileChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Verification Modal -->
+  <div class="modal" id="verificationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Profile Verification</h2>
+        <button class="close-modal" onclick="closeVerification()">×</button>
+      </div>
+      <div class="verification-container">
+        <p>Get verified to increase your matches and build trust with other users.</p>
+        
+        <div class="verification-steps">
+          <div class="verification-step">
+            <div class="verification-step-number">1</div>
+            <div>Record a short video saying the random phrase shown below</div>
+          </div>
+          <div class="verification-step">
+            <div class="verification-step-number">2</div>
+            <div>Our AI will verify your identity matches your profile photos</div>
+          </div>
+          <div class="verification-step">
+            <div class="verification-step-number">3</div>
+            <div>Get your verified badge instantly</div>
+          </div>
+        </div>
+        
+        <div id="verificationPhrase">Generating verification code...</div>
+        
+        <div class="verification-video" id="verificationVideoContainer">
+          <video id="videoElement" autoplay playsinline style="display: none;"></video>
+          <div id="videoPlaceholder">Camera will appear here when you start</div>
+        </div>
+        
+        <div id="verificationStatus"></div>
+        
+        <button id="startVerificationBtn" onclick="startVerification()">Start Verification</button>
+        <button id="submitVerificationBtn" onclick="submitVerification()" style="display: none;">Submit Verification</button>
+        <div class="spinner" id="verificationSpinner" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // DOM elements
+    const profileContainer = document.getElementById('profileContainer');
+    const profileName = document.getElementById('profileName');
+    const profileAge = document.getElementById('profileAge');
+    const profileRole = document.getElementById('profileRole');
+    const profilePreferences = document.getElementById('profilePreferences');
+    const profileBio = document.getElementById('profileBio');
+    const profileLocation = document.getElementById('profileLocation');
+    const profileInterests = document.getElementById('profileInterests');
+    const profileImage = document.getElementById('profileImage');
+    const profileVerified = document.getElementById('profileVerified');
+    const verificationButton = document.getElementById('verificationButton');
+
+    // Verification elements
+    const videoElement = document.getElementById('videoElement');
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const startVerificationBtn = document.getElementById('startVerificationBtn');
+    const submitVerificationBtn = document.getElementById('submitVerificationBtn');
+    const verificationSpinner = document.getElementById('verificationSpinner');
+    const verificationStatus = document.getElementById('verificationStatus');
+    const verificationPhrase = document.getElementById('verificationPhrase');
+    let mediaStream = null;
+    let verificationCode = '';
+
+    // Current user data
+    let currentUserData = null;
+
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in
+          loadUserProfile(user.uid);
+        } else {
+          // No user is signed in
+          window.location.href = 'login.html';
+        }
+      });
+    });
+
+    // Load user profile from Firestore
+    async function loadUserProfile(userId) {
+      try {
+        const doc = await db.collection('users').doc(userId).get();
+        if (doc.exists) {
+          currentUserData = doc.data();
+          updateProfileUI(currentUserData);
+          
+          // Check verification status
+          if (currentUserData.verified) {
+            profileVerified.style.display = 'inline-block';
+            verificationButton.textContent = 'Verified';
+            verificationButton.disabled = true;
+          }
+          
+          // Populate edit modal with current data
+          populateEditModal(currentUserData);
+        } else {
+          console.log('No profile found, creating default');
+          createDefaultProfile(userId);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Error loading profile. Please try again.');
+      }
+    }
+
+    // Create default profile if none exists
+    async function createDefaultProfile(userId) {
+      const defaultProfile = {
+        name: 'New User',
+        age: 18,
+        role: 'vers',
+        preferences: 'none',
+        bio: '',
+        location: '',
+        interests: '',
+        verified: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      try {
+        await db.collection('users').doc(userId).set(defaultProfile);
+        currentUserData = defaultProfile;
+        updateProfileUI(currentUserData);
+        populateEditModal(currentUserData);
+      } catch (error) {
+        console.error('Error creating profile:', error);
+      }
+    }
+
+    // Update the profile UI with data
+    function updateProfileUI(data) {
+      profileName.textContent = data.name || 'Anonymous';
+      profileAge.textContent = data.age ? `${data.age}` : '';
+      profilePreferences.textContent = data.preferences ? capitalizeFirstLetter(data.preferences) : 'Not specified';
+      profileBio.textContent = data.bio || 'No bio yet';
+      profileLocation.textContent = data.location || 'Location not set';
+      profileInterests.textContent = data.interests || 'No interests specified';
+      
+      // Set role badge
+      if (data.role) {
+        profileRole.textContent = capitalizeFirstLetter(data.role);
+        profileRole.className = 'role-display ' + getRoleBadgeClass(data.role);
+      }
+      
+      // Set profile image if available
+      if (data.profileImageUrl) {
+        profileImage.src = data.profileImageUrl;
+      }
+      
+      // Show verification badge if verified
+      if (data.verified) {
+        profileVerified.style.display = 'inline-block';
+      }
+    }
+
+    // Populate edit modal with current data
+    function populateEditModal(data) {
+      document.getElementById('editName').value = data.name || '';
+      document.getElementById('editAge').value = data.age || '';
+      document.getElementById('editPreferences').value = data.preferences || 'none';
+      document.getElementById('editLocation').value = data.location || '';
+      document.getElementById('editBio').value = data.bio || '';
+      document.getElementById('editInterests').value = data.interests || '';
+      
+      // Set role radio button
+      if (data.role) {
+        document.getElementById(`role${capitalizeFirstLetter(data.role)}`).checked = true;
+        document.querySelector(`input[name="role"][value="${data.role}"]`).parentElement.classList.add('selected');
+      }
+    }
+
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'flex';
+    }
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+    
+    function openEditProfileModal() {
+      openModal('editProfileModal');
+    }
+    
+    function openVerificationModal() {
+      // Generate a random verification phrase
+      verificationCode = generateVerificationCode();
+      verificationPhrase.textContent = `"ConnectMe verification code: ${verificationCode}"`;
+      
+      openModal('verificationModal');
+    }
+    
+    function closeVerification() {
+      // Stop camera if running
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      
+      // Reset verification UI
+      videoElement.style.display = 'none';
+      videoPlaceholder.style.display = 'block';
+      startVerificationBtn.style.display = 'block';
+      submitVerificationBtn.style.display = 'none';
+      verificationSpinner.style.display = 'none';
+      verificationStatus.textContent = '';
+      
+      closeModal('verificationModal');
+    }
+
+    // Role selection
+    function selectRole(role) {
+      document.querySelectorAll('.role-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.role-option').classList.add('selected');
+    }
+
+    // Save profile changes to Firestore
+    async function saveProfileChanges() {
+      const userId = auth.currentUser.uid;
+      if (!userId) return;
+      
+      const name = document.getElementById('editName').value;
+      const age = document.getElementById('editAge').value;
+      const role = document.querySelector('input[name="role"]:checked')?.value;
+      const preferences = document.getElementById('editPreferences').value;
+      const location = document.getElementById('editLocation').value;
+      const bio = document.getElementById('editBio').value;
+      const interests = document.getElementById('editInterests').value;
+      const photoFile = document.getElementById('profilePhotoUpload').files[0];
+      
+      // Basic validation
+      if (!name || !age || !role || !preferences) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      try {
+        let profileImageUrl = currentUserData.profileImageUrl;
+        
+        // Upload new photo if selected
+        if (photoFile) {
+          const storageRef = storage.ref(`profile_images/${userId}`);
+          const snapshot = await storageRef.put(photoFile);
+          profileImageUrl = await snapshot.ref.getDownloadURL();
+        }
+        
+        // Update profile data
+        const updatedData = {
+          name,
+          age: parseInt(age),
+          role,
+          preferences,
+          location,
+          bio,
+          interests,
+          profileImageUrl,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        await db.collection('users').doc(userId).update(updatedData);
+        
+        // Update UI with new data
+        currentUserData = { ...currentUserData, ...updatedData };
+        updateProfileUI(currentUserData);
+        
+        closeModal('editProfileModal');
+        alert('Profile updated successfully!');
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        alert('Error saving profile. Please try again.');
+      }
+    }
+
+    // Verification functions
+    async function startVerification() {
+      try {
+        // Request camera access
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        
+        // Show video stream
+        videoElement.srcObject = mediaStream;
+        videoElement.style.display = 'block';
+        videoPlaceholder.style.display = 'none';
+        
+        // Update UI
+        startVerificationBtn.style.display = 'none';
+        submitVerificationBtn.style.display = 'block';
+        verificationStatus.textContent = 'Recording... Say the verification phrase clearly';
+        
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        verificationStatus.textContent = 'Could not access camera. Please allow camera permissions.';
+      }
+    }
+
+    async function submitVerification() {
+      const userId = auth.currentUser.uid;
+      if (!userId) return;
+      
+      try {
+        // Show loading spinner
+        submitVerificationBtn.style.display = 'none';
+        verificationSpinner.style.display = 'block';
+        verificationStatus.textContent = 'Processing verification...';
+        
+        // In a real app, you would:
+        // 1. Record the video stream
+        // 2. Upload to your verification service
+        // 3. Wait for verification result
+        
+        // Simulate verification processing
+        setTimeout(async () => {
+          // Mark as verified in Firestore
+          await db.collection('users').doc(userId).update({
+            verified: true,
+            verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          // Update UI
+          profileVerified.style.display = 'inline-block';
+          verificationButton.textContent = 'Verified';
+          verificationButton.disabled = true;
+          
+          // Close verification modal
+          closeVerification();
+          alert('Verification successful! Your profile is now verified.');
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Error during verification:', error);
+        verificationStatus.textContent = 'Verification failed. Please try again.';
+        verificationSpinner.style.display = 'none';
+        submitVerificationBtn.style.display = 'block';
+      }
+    }
+
+    // Generate random verification code
+    function generateVerificationCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let result = '';
+      for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    // Helper functions
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function getRoleBadgeClass(role) {
+      switch (role) {
+        case 'top': return 'top-badge';
+        case 'bottom': return 'bottom-badge';
+        case 'vers': return 'vers-badge';
+        case 'side': return 'side-badge';
+        default: return '';
+      }
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to log out?')) {
+        auth.signOut().then(() => {
+          window.location.href = 'login.html';
+        }).catch(error => {
+          console.error('Error signing out:', error);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
